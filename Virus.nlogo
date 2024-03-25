@@ -61,7 +61,7 @@ to setup-constants
   set carrying-capacity 300
   set chance-reproduce 1
   set immunity-duration 52
-  set mask-effectiveness 25
+  
 
 end
 
