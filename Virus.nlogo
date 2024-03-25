@@ -11,7 +11,8 @@ globals
     lifespan             ;; the lifespan of a turtle
     chance-reproduce     ;; the probability of a turtle generating an offspring each tick
     carrying-capacity    ;; the number of turtles that can be in the world at one time
-    immunity-duration ]  ;; how many weeks immunity lasts	 	
+    immunity-duration ]	 ;; the length immunity lasts] 
+
     
 ;; The setup is divided into four procedures
 to setup
@@ -106,13 +107,22 @@ to move ;; turtle procedure
   fd 1
 end
 
+
 ;; If a turtle is sick, it infects other turtles on the same patch.
 ;; Immune turtles don't get sick.
 to infect ;; turtle procedure
+  let infection-modifier 1 ;;
+  ;; Seasonal Logic
+  if current-season = "Winter" [ set infection-modifier 1.56 ]  ;; Increase for winter
+  if current-season = "Spring" [ set infection-modifier 1 ]     ;; Base for Spring
+  if current-season = "Summer" [ set infection-modifier 0.54 ]  ;; Decrease for summer
+  if current-season = "Fall"   [ set infection-modifier 1 ]     ;; Base for fall
+  
   ask other turtles-here with [ not sick? and not immune? ]
-  [ if random-float 100 < infectiousness / (ifelse-value mask? [mask-effectiveness] [1])
+  [ if random-float 100 < (infectiousness * infection-modifier) / (ifelse-value mask? [mask-effectiveness] [1])
       [ get-sick ] ]
 end
+
 
 ;; Once the turtle has been sick long enough, it
 ;; either recovers (and becomes immune) or it dies.
@@ -122,6 +132,7 @@ to recover-or-die ;; turtle procedure
       [ become-immune ]
       [ die ] ]
 end
+
 
 ;; If there are less turtles than the carrying-capacity
 ;; then turtles can reproduce.
@@ -133,9 +144,11 @@ to reproduce
         get-healthy ] ]
 end
 
+
 to-report immune?
   report remaining-immunity > 0
 end
+
 
 to startup
   setup-constants ;; so that carrying-capacity can be used as upper bound of number-people slider
@@ -146,13 +159,13 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-288
+310
 10
-778
-501
+781
+482
 -1
 -1
-13.77
+13.22
 1
 10
 1
@@ -381,6 +394,16 @@ mask-effectiveness
 1
 1
 11
+
+CHOOSER
+319
+504
+459
+549
+current-season
+current-season
+"Winter" "Spring" "Summer" "Fall"
+0
 @#$#@#$#@
 ## WHAT IS IT?
 
