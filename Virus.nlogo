@@ -1,5 +1,6 @@
 turtles-own
   [ sick?                ;; if true, the turtle is infectious
+    mask?								 ;; if true, the person is wearing a mask
     remaining-immunity   ;; how many weeks of immunity the turtle has left
     sick-time            ;; how long, in weeks, the turtle has been infectious
     age ]                ;; how many weeks old the turtle is
@@ -10,8 +11,8 @@ globals
     lifespan             ;; the lifespan of a turtle
     chance-reproduce     ;; the probability of a turtle generating an offspring each tick
     carrying-capacity    ;; the number of turtles that can be in the world at one time
-    immunity-duration ]  ;; how many weeks immunity lasts
-
+    immunity-duration ]  ;; how many weeks immunity lasts	 	
+    
 ;; The setup is divided into four procedures
 to setup
   clear-all
@@ -31,7 +32,8 @@ to setup-turtles
       set sick-time 0
       set remaining-immunity 0
       set size 1.5  ;; easier to see
-      get-healthy ]
+      get-healthy
+      set mask? random-float 100 < People-masked]
   ask n-of 10 turtles
     [ get-sick ]
 end
@@ -59,6 +61,8 @@ to setup-constants
   set carrying-capacity 300
   set chance-reproduce 1
   set immunity-duration 52
+  set mask-effectiveness 25
+
 end
 
 to go
@@ -76,7 +80,7 @@ end
 to update-global-variables
   if count turtles > 0
     [ set %infected (count turtles with [ sick? ] / count turtles) * 100
-      set %immune (count turtles with [ immune? ] / count turtles) * 100 ]
+      set %immune (count turtles with [ immune? ] / count turtles) * 100]
 end
 
 to update-display
@@ -106,7 +110,7 @@ end
 ;; Immune turtles don't get sick.
 to infect ;; turtle procedure
   ask other turtles-here with [ not sick? and not immune? ]
-    [ if random-float 100 < infectiousness
+  [ if random-float 100 < infectiousness / (ifelse-value mask? [mask-effectiveness] [1])
       [ get-sick ] ]
 end
 
@@ -142,13 +146,13 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-280
+288
 10
 778
-509
+501
 -1
 -1
-14
+13.77
 1
 10
 1
@@ -171,7 +175,7 @@ ticks
 SLIDER
 40
 155
-234
+240
 188
 duration
 duration
@@ -186,7 +190,7 @@ HORIZONTAL
 SLIDER
 40
 121
-234
+240
 154
 chance-recover
 chance-recover
@@ -201,7 +205,7 @@ HORIZONTAL
 SLIDER
 40
 87
-234
+240
 120
 infectiousness
 infectiousness
@@ -317,14 +321,66 @@ ticks / 52
 11
 
 CHOOSER
-65
-195
-210
-240
+35
+280
+180
+325
 turtle-shape
 turtle-shape
 "person" "circle"
 0
+
+SLIDER
+40
+190
+240
+223
+people-masked
+people-masked
+0
+300
+50
+1
+1
+People
+HORIZONTAL
+
+MONITOR
+185
+280
+255
+325
+Masked
+People-masked
+1
+1
+11
+
+SLIDER
+40
+225
+210
+258
+mask-effectiveness
+mask-effectiveness
+0
+100
+50
+1
+1
+%
+HORIZONTAL
+
+MONITOR
+215
+225
+285
+270
+meffect
+mask-effectiveness
+1
+1
+11
 @#$#@#$#@
 ## WHAT IS IT?
 
