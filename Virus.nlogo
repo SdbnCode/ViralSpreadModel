@@ -108,7 +108,9 @@ to transmit_virus
   let transmission_modifier 1
   if current-season = "Winter" [ set transmission_modifier 1.56 ]
   if current-season = "Summer" [ set transmission_modifier 0.54 ]
-  
+  ask turtles [
+    if mask-effectiveness < 0.1 [set mask-effectiveness 0.1]]
+
   ask other turtles-here with [ not covid_positive? and not is_immune? ]
   [ if random-float 100 < (infectiousness * transmission_modifier) / (ifelse-value wearing_mask? [mask-effectiveness] [1])
       [ become_infected ] ]
