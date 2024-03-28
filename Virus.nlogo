@@ -1,171 +1,155 @@
 turtles-own
-  [ sick?                ;; if true, the turtle is infectious
-    mask?								 ;; if true, the person is wearing a mask
-    remaining-immunity   ;; how many weeks of immunity the turtle has left
-    sick-time            ;; how long, in weeks, the turtle has been infectious
-    age ]                ;; how many weeks old the turtle is
+  [ covid_positive?          ;; true if the individual currently has covid-19
+    wearing_mask?            ;; true if the individual is wearing a mask
+    remaining_immunity_weeks ;; weeks of immunity left for the individual
+    infection_duration       ;; duration in weeks the individual has been infected
+    individual_age ]         ;; age of the individual in weeks
 
 globals
-  [ %infected            ;; what % of the population is infectious
-    %immune              ;; what % of the population is immune
-    lifespan             ;; the lifespan of a turtle
-    chance-reproduce     ;; the probability of a turtle generating an offspring each tick
-    carrying-capacity    ;; the number of turtles that can be in the world at one time
-    immunity-duration ]	 ;; the length immunity lasts] 
+  [ percent_positive         ;; what percent of the population is covid-positive
+    percent_immune           ;; what percent of the population is immune
+    individual_lifespan      ;; expected lifespan of an individual
+    reproduction_odds        ;; odds of an individual reproducing each tick
+    environment_capacity     ;; carrying capacity of the environment
+    immunity_period ]        ;; how long immunity lasts, in weeks
 
-    
-;; The setup is divided into four procedures
+;; initialize the model
 to setup
   clear-all
-  setup-constants
-  setup-turtles
-  update-global-variables
-  update-display
+  define_parameters
+  initialize_population
+  calculate_statistics
+  visualize_population
   reset-ticks
 end
 
-;; We create a variable number of turtles of which 10 are infectious,
-;; and distribute them randomly
-to setup-turtles
+;; create a set number of individuals with some initially covid-positive
+to initialize_population
   create-turtles number-people
     [ setxy random-xcor random-ycor
-      set age random lifespan
-      set sick-time 0
-      set remaining-immunity 0
-      set size 1.5  ;; easier to see
-      get-healthy
-      set mask? random-float 100 < People-masked]
-  ask n-of 10 turtles
-    [ get-sick ]
+      set individual_age random individual_lifespan
+      set infection_duration 0
+      set remaining_immunity_weeks 0
+      set size 1.5  ;; makes individuals easier to spot
+      regain_health
+      set wearing_mask? random-float 100 < people-masked]
+  ask n-of 10 turtles [ become_infected ]
 end
 
-to get-sick ;; turtle procedure
-  set sick? true
-  set remaining-immunity 0
+;; procedures to change the state of health of the individuals
+to become_infected
+  set covid_positive? true
+  set remaining_immunity_weeks 0
 end
 
-to get-healthy ;; turtle procedure
-  set sick? false
-  set remaining-immunity 0
-  set sick-time 0
+to regain_health
+  set covid_positive? false
+  set remaining_immunity_weeks 0
+  set infection_duration 0
 end
 
-to become-immune ;; turtle procedure
-  set sick? false
-  set sick-time 0
-  set remaining-immunity immunity-duration
+to develop_immunity
+  set covid_positive? false
+  set infection_duration 0
+  set remaining_immunity_weeks immunity_period
 end
 
-;; This sets up basic constants of the model.
-to setup-constants
-  set lifespan 50 * 52      ;; 50 times 52 weeks = 50 years = 2600 weeks old
-  set carrying-capacity 300
-  set chance-reproduce 1
-  set immunity-duration 52
-  
-
+;; set up model constants
+to define_parameters
+  set individual_lifespan 50 * 52      ;; lifespan in weeks
+  set environment_capacity 300
+  set reproduction_odds 0.01           ;; 1% reproduction chance
+  set immunity_period 52               ;; immunity lasts one year
 end
 
+;; main model loop
 to go
   ask turtles [
-    get-older
-    move
-    if sick? [ recover-or-die ]
-    ifelse sick? [ infect ] [ reproduce ]
+    age_individual
+    random_move
+    if covid_positive? [ resolve_infection ]
+    ifelse covid_positive? [ transmit_virus ] [ reproduce ]
   ]
-  update-global-variables
-  update-display
+  calculate_statistics
+  visualize_population
   tick
 end
 
-to update-global-variables
+;; update statistics for the population
+to calculate_statistics
   if count turtles > 0
-    [ set %infected (count turtles with [ sick? ] / count turtles) * 100
-      set %immune (count turtles with [ immune? ] / count turtles) * 100]
+    [ set percent_positive (count turtles with [ covid_positive? ] / count turtles) * 100
+      set percent_immune (count turtles with [ is_immune? ] / count turtles) * 100 ]
 end
 
-to update-display
+;; update visuals based on health status
+to visualize_population
   ask turtles
-    [ if shape != turtle-shape [ set shape turtle-shape ]
-      set color ifelse-value sick? [ red ] [ ifelse-value immune? [ grey ] [ green ] ] ]
+    [ if shape != "person" [ set shape "person" ]
+      set color ifelse-value covid_positive? [ red ] [ ifelse-value is_immune? [ grey ] [ green ] ] ]
 end
 
-;;Turtle counting variables are advanced.
-to get-older ;; turtle procedure
-  ;; Turtles die of old age once their age exceeds the
-  ;; lifespan (set at 50 years in this model).
-  set age age + 1
-  if age > lifespan [ die ]
-  if immune? [ set remaining-immunity remaining-immunity - 1 ]
-  if sick? [ set sick-time sick-time + 1 ]
+;; procedures to manage individual aging and health status
+to age_individual
+  set individual_age individual_age + 1
+  if individual_age > individual_lifespan [ die ]
+  if is_immune? [ set remaining_immunity_weeks remaining_immunity_weeks - 1 ]
+  if covid_positive? [ set infection_duration infection_duration + 1 ]
 end
 
-;; Turtles move about at random.
-to move ;; turtle procedure
+to random_move ;; makes individuals move randomly
   rt random 100
   lt random 100
   fd 1
 end
 
-
-;; If a turtle is sick, it infects other turtles on the same patch.
-;; Immune turtles don't get sick.
-to infect ;; turtle procedure
-  let infection-modifier 1 ;;
-  ;; Seasonal Logic
-  if current-season = "Winter" [ set infection-modifier 1.56 ]  ;; Increase for winter
-  if current-season = "Spring" [ set infection-modifier 1 ]     ;; Base for Spring
-  if current-season = "Summer" [ set infection-modifier 0.54 ]  ;; Decrease for summer
-  if current-season = "Fall"   [ set infection-modifier 1 ]     ;; Base for fall
+;; handling virus transmission with mask and season modifiers
+to transmit_virus
+  let transmission_modifier 1
+  if current-season = "Winter" [ set transmission_modifier 1.56 ]
+  if current-season = "Summer" [ set transmission_modifier 0.54 ]
   
-  ask other turtles-here with [ not sick? and not immune? ]
-  [ if random-float 100 < (infectiousness * infection-modifier) / (ifelse-value mask? [mask-effectiveness] [1])
-      [ get-sick ] ]
+  ask other turtles-here with [ not covid_positive? and not is_immune? ]
+  [ if random-float 100 < (infectiousness * transmission_modifier) / (ifelse-value wearing_mask? [mask-effectiveness] [1])
+      [ become_infected ] ]
 end
 
-
-;; Once the turtle has been sick long enough, it
-;; either recovers (and becomes immune) or it dies.
-to recover-or-die ;; turtle procedure
-  if sick-time > duration                        ;; If the turtle has survived past the virus' duration, then
-    [ ifelse random-float 100 < chance-recover   ;; either recover or die
-      [ become-immune ]
+;; resolution of infection, individuals recover or perish
+to resolve_infection
+  if infection_duration > duration
+    [ ifelse random-float 100 < chance-recover
+      [ develop_immunity ]
       [ die ] ]
 end
 
-
-;; If there are less turtles than the carrying-capacity
-;; then turtles can reproduce.
+;; reproduction logic based on environment capacity
 to reproduce
-  if count turtles < carrying-capacity and random-float 100 < chance-reproduce
+  if count turtles < environment_capacity and random-float 100 < reproduction_odds
     [ hatch 1
-      [ set age 1
+      [ set individual_age 1
         lt 45 fd 1
-        get-healthy ] ]
+        regain_health ] ]
 end
 
-
-to-report immune?
-  report remaining-immunity > 0
+;; report immunity status
+to-report is_immune?
+  report remaining_immunity_weeks > 0
 end
 
-
+;; ensure parameters are defined for the user interface elements
 to startup
-  setup-constants ;; so that carrying-capacity can be used as upper bound of number-people slider
+  define_parameters ;; sets up constants used in the interface
 end
 
-
-; Copyright 1998 Uri Wilensky.
-; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
 310
 10
-781
-482
+773
+474
 -1
 -1
-13.22
+13
 1
 10
 1
@@ -280,10 +264,10 @@ true
 true
 "" ""
 PENS
-"sick" 1 0 -2674135 true "" "plot count turtles with [ sick? ]"
-"immune" 1 0 -7500403 true "" "plot count turtles with [ immune? ]"
-"healthy" 1 0 -10899396 true "" "plot count turtles with [ not sick? and not immune? ]"
-"total" 1 0 -13345367 true "" "plot count turtles"
+"sick" 1 0 -2674135 true "" "plot count turtles with [covid_positive?]"
+"immune" 1 0 -7500403 true "" "plot count turtles with [remaining_immunity_weeks > 0]"
+"healthy" 1 0 -10899396 true "" "plot count turtles with [not covid_positive?]"
+"total" 1 0 -13345367 true "" "plot count turtles\n"
 
 SLIDER
 40
@@ -293,7 +277,7 @@ SLIDER
 number-people
 number-people
 10
-carrying-capacity
+environment_capacity
 150
 1
 1
@@ -306,7 +290,7 @@ MONITOR
 103
 373
 NIL
-%infected
+percent_positive
 1
 1
 11
@@ -317,7 +301,7 @@ MONITOR
 179
 373
 NIL
-%immune
+percent_immune
 1
 1
 11
