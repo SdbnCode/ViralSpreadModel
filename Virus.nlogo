@@ -25,8 +25,9 @@ end
 
 ;; create a set number of individuals with some initially covid-positive
 to initialize_population
-  create-turtles number-people
-    [ setxy random-xcor random-ycor
+  create-turtles population
+    [ set shape "person" 
+      setxy random-xcor random-ycor
       set individual_age random individual_lifespan
       set infection_duration 0
       set remaining_immunity_weeks 0
@@ -85,8 +86,7 @@ end
 ;; update visuals based on health status
 to visualize_population
   ask turtles
-    [ if shape != "person" [ set shape "person" ]
-      set color ifelse-value covid_positive? [ red ] [ ifelse-value is_immune? [ grey ] [ green ] ] ]
+    [ set color ifelse-value covid_positive? [ red ] [ ifelse-value is_immune? [ grey ] [ green ] ] ]
 end
 
 ;; procedures to manage individual aging and health status
@@ -117,7 +117,7 @@ end
 ;; resolution of infection, individuals recover or perish
 to resolve_infection
   if infection_duration > duration
-    [ ifelse random-float 100 < chance-recover
+    [ ifelse random-float 100 < recovery-rate
       [ develop_immunity ]
       [ die ] ]
 end
@@ -143,13 +143,13 @@ end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
-310
-10
-773
-474
+317
+0
+750
+434
 -1
 -1
-13
+12.13
 1
 10
 1
@@ -189,8 +189,8 @@ SLIDER
 121
 240
 154
-chance-recover
-chance-recover
+recovery-rate
+recovery-rate
 0.0
 99.0
 75
@@ -208,7 +208,7 @@ infectiousness
 infectiousness
 0.0
 99.0
-65
+75
 1.0
 1
 %
@@ -249,9 +249,9 @@ NIL
 0
 
 PLOT
-15
-375
-267
+10
+362
+290
 539
 Populations
 weeks
@@ -264,7 +264,7 @@ true
 true
 "" ""
 PENS
-"sick" 1 0 -2674135 true "" "plot count turtles with [covid_positive?]"
+"covid-19" 1 0 -2674135 true "" "plot count turtles with [covid_positive?]"
 "immune" 1 0 -7500403 true "" "plot count turtles with [remaining_immunity_weeks > 0]"
 "healthy" 1 0 -10899396 true "" "plot count turtles with [not covid_positive?]"
 "total" 1 0 -13345367 true "" "plot count turtles\n"
@@ -274,21 +274,21 @@ SLIDER
 10
 234
 43
-number-people
-number-people
+population
+population
 10
 environment_capacity
-150
+200
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-28
-328
-103
-373
+10
+315
+102
+360
 NIL
 percent_positive
 1
@@ -296,10 +296,10 @@ percent_positive
 11
 
 MONITOR
-105
-328
-179
-373
+110
+315
+210
+360
 NIL
 percent_immune
 1
@@ -307,25 +307,15 @@ percent_immune
 11
 
 MONITOR
-181
-329
-255
-374
+215
+315
+289
+360
 years
 ticks / 52
 1
 1
 11
-
-CHOOSER
-35
-280
-180
-325
-turtle-shape
-turtle-shape
-"person" "circle"
-0
 
 SLIDER
 40
@@ -342,21 +332,10 @@ people-masked
 People
 HORIZONTAL
 
-MONITOR
-185
-280
-255
-325
-Masked
-People-masked
-1
-1
-11
-
 SLIDER
 40
 225
-210
+240
 258
 mask-effectiveness
 mask-effectiveness
@@ -368,22 +347,11 @@ mask-effectiveness
 %
 HORIZONTAL
 
-MONITOR
-215
-225
-285
-270
-meffect
-mask-effectiveness
-1
-1
-11
-
 CHOOSER
-319
-504
-459
-549
+40
+265
+240
+310
 current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
