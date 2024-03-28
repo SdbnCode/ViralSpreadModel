@@ -143,13 +143,13 @@ end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
-317
+270
 0
-750
-434
+600
+331
 -1
 -1
-12.13
+9.2
 1
 10
 1
@@ -249,10 +249,10 @@ NIL
 0
 
 PLOT
-10
-362
-290
-539
+270
+391
+600
+641
 Populations
 weeks
 people
@@ -278,17 +278,17 @@ population
 population
 10
 environment_capacity
-200
+100
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-10
-315
-102
-360
+275
+335
+375
+380
 NIL
 percent_positive
 1
@@ -296,10 +296,10 @@ percent_positive
 11
 
 MONITOR
-110
-315
-210
-360
+395
+335
+495
+380
 NIL
 percent_immune
 1
@@ -307,10 +307,10 @@ percent_immune
 11
 
 MONITOR
-215
-315
-289
-360
+505
+335
+605
+380
 years
 ticks / 52
 1
@@ -355,7 +355,7 @@ CHOOSER
 current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
-0
+2
 @#$#@#$#@
 ## WHAT IS IT?
 
