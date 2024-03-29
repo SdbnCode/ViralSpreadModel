@@ -61,6 +61,7 @@ to define_parameters
   set environment_capacity 300
   set reproduction_odds 0.01           ;; 1% reproduction chance
   set immunity_period 52               ;; immunity lasts one year
+  set social-distancing 10             ;; intial level of social distancing
 end
 
 ;; main model loop
@@ -98,9 +99,18 @@ to age_individual
 end
 
 to random_move ;; makes individuals move randomly
+  let move-distance 1
+  ifelse any? other turtles in-radius 3
+  [
+    let distance-factor (100 - social-distancing) / 100
+    set move-distance move-distance * distance-factor
+  ]
+  [
+    set move-distance 1
+  ]
   rt random 100
   lt random 100
-  fd 1
+  fd move-distance
 end
 
 ;; handling virus transmission with mask and season modifiers
@@ -358,6 +368,22 @@ current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
 2
+
+SLIDER
+40
+195
+240
+228
+social-distancing
+social-distancing
+0
+100
+50
+1
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 
