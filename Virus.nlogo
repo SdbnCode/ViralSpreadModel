@@ -198,9 +198,9 @@ HORIZONTAL
 
 SLIDER
 40
-121
+120
 240
-154
+153
 recovery-rate
 recovery-rate
 0.0
@@ -213,9 +213,9 @@ HORIZONTAL
 
 SLIDER
 40
-87
+85
 240
-120
+118
 infectiousness
 infectiousness
 0.0
@@ -227,10 +227,10 @@ infectiousness
 HORIZONTAL
 
 BUTTON
-62
-48
-132
-83
+65
+10
+135
+42
 NIL
 setup
 NIL
@@ -244,10 +244,10 @@ NIL
 1
 
 BUTTON
-138
-48
-209
-84
+140
+10
+211
+42
 NIL
 go
 T
@@ -283,9 +283,9 @@ PENS
 
 SLIDER
 40
-10
-234
-43
+50
+240
+83
 population
 population
 10
@@ -346,14 +346,14 @@ HORIZONTAL
 
 SLIDER
 40
-230
+225
 240
-263
+258
 mask-effectiveness
 mask-effectiveness
 0
 100
-50
+25
 1
 1
 %
@@ -361,9 +361,9 @@ HORIZONTAL
 
 CHOOSER
 40
-305
+295
 240
-350
+340
 current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
@@ -371,9 +371,9 @@ current-season
 
 SLIDER
 40
-265
+260
 240
-298
+293
 social-distancing
 social-distancing
 0
