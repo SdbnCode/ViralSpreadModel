@@ -346,9 +346,9 @@ HORIZONTAL
 
 SLIDER
 40
-225
+230
 240
-258
+263
 mask-effectiveness
 mask-effectiveness
 0
@@ -361,9 +361,9 @@ HORIZONTAL
 
 CHOOSER
 40
-265
+305
 240
-310
+350
 current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
@@ -371,9 +371,9 @@ current-season
 
 SLIDER
 40
-195
+265
 240
-228
+298
 social-distancing
 social-distancing
 0
@@ -383,7 +383,6 @@ social-distancing
 1
 NIL
 HORIZONTAL
-
 @#$#@#$#@
 ## WHAT IS IT?
 
