@@ -64,9 +64,8 @@ end
 to define_parameters
 set individual_lifespan 50 * 52      ;; lifespan in weeks
 set environment_capacity 300
-set reproduction_odds 0.01           ;; 1% reproduction chance
+set reproduction_odds 1           ;; 1% reproduction chance
 set immunity_period 52               ;; immunity lasts one year
-set social-distancing 10             ;; intial level of social distancing
 set vaccine_effectiveness_reduction 0.18  ;; 82% reduction in infection chance due to vaccination
 end
 
@@ -394,7 +393,7 @@ CHOOSER
 current-season
 current-season
 "Winter" "Spring" "Summer" "Fall"
-2
+0
 
 SLIDER
 40
