@@ -1,9 +1,6 @@
-# COMP 3710 Group Project - ViralSpreadModel 
+# COMP 3710 Group Project - Agent Based Simulation of COVID-19 Transmission
 
-1. Clone to your computer
-2. Work on the model on Netlogo Web
-3. Copy over changes to github repo
-4. Save a local version just in case
-
-# Netlogo Web allows us to export to either Netlogo or HTML
-# Export BOTH and upload BOTH versions to the github repo
+How to run model
+1. Download NetLogo or head to https://www.netlogoweb.org/
+2. Import the VirusFinal.nlogo file
+3. Run the simulation.
